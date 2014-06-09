@@ -24,7 +24,7 @@ int MySocket::TcpListen(unsigned int nPort)
 {
 
 	int listenfd;
-	socklen_t len;
+	//socklen_t len;
 	struct sockaddr_in servaddr;
 	listenfd = socket(AF_INET,SOCK_STREAM,0);
 
@@ -54,7 +54,7 @@ int MySocket::TcpAccept(int listenfd)
 
 	int accfd;
 
-	//cliaddr±£´æ¶Ô¶ËµÄÁ¬½ÓÐÅÏ¢
+	//cliaddrï¿½ï¿½ï¿½ï¿½Ô¶Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 	if ((accfd = accept(listenfd,(struct sockaddr *)&cliaddr,&clilen)) == -1)
 	{
 		//accept error
@@ -76,17 +76,15 @@ int MySocket::TcpSend(int sockfd, char *ptr, int size)
 	return ERROR_NO_ERROR;
 }
 
-int MySocket::TcpRecv(int sockfd)
+int MySocket::TcpRecv(int sockfd, char *ptr, int size)
 {
 	ssize_t n;
-	char buf[MAXLINE];
-	while ((n = read(sockfd,buf,MAXLINE)) > 0)
+	//char buf[MAXLINE];
+	if ((n = read(sockfd,ptr,size)) > 0)
 	{
-		printf("recv:[%d][%s]\n",n,buf);
+		printf("recv:[%d][%s]\n",n,ptr);
 	}
-	
-	
-	return ERROR_NO_ERROR;
+	return n;
 }
 
 int MySocket::TcpClose(int sockfd)

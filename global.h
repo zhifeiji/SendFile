@@ -8,7 +8,7 @@
 
 
 
-//socketµÄ¿Í»§¶Ë£¬¸ºÔðÏòserver·¢ËÍÎÄ¼þÊý¾Ý
+//socketï¿½Ä¿Í»ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½serverï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½
 #include	<sys/types.h>	/* basic system data types */
 #include	<sys/socket.h>	/* basic socket definitions */
 #if TIME_WITH_SYS_TIME
@@ -47,7 +47,13 @@ using namespace std;
 #define	LISTENQ		1024	/* 2nd argument to listen() */
 #define SERVER_PORT	4000
 
+//socket msg
+#define MS_MSG_REQ_SENDFILE	100
+
+//error no
 #define ERROR_NO_ERROR	0
+
+
 
 #define ERROR_EXIT(szMsg) \
 	printf("error:%s\n",szMsg);\
@@ -182,31 +188,5 @@ sig_chld(int signo)
 	return;
 }
 
-static
-void
-web_child(int sockfd)
-{
-	int			ntowrite;
-	ssize_t		nread;
-	char		line[MAXLINE], result[MAXN];
-
-	for ( ; ; ) 
-	{
-		if ( (nread = readline(sockfd, line, MAXLINE)) == 0)
-			return;		/* connection closed by other end */
-
-		/* 4line from client specifies #bytes to write back */
-		//ntowrite = atol(line);
-		//if ((ntowrite <= 0) || (ntowrite > MAXN))
-		//{
-		//	printf("client request for %d bytes", ntowrite);
-		//	exit(-1);
-		//}
-		//display recv
-		printf("%s",line);
-
-		//writen(sockfd, result, ntowrite);
-	}
-}
 
 #endif

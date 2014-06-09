@@ -1,14 +1,15 @@
 //#
 #include "global.h"
 #include "CMySocket.h"
+#include "CSerialize.h"
 
 int
 main(int argc, char **argv)
 {
 	using namespace MySocket;
 
-	int	 fd;//Á¬½ÓserverµÄsocketÃèÊö·û
-	int nchildren;//±íÊ¾×Ó½ø³ÌÊýÁ¿
+	int	 fd;//ï¿½ï¿½ï¿½ï¿½serverï¿½ï¿½socketï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int nchildren;//ï¿½ï¿½Ê¾ï¿½Ó½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	pid_t	pid;
 	char	request[MAXLINE], reply[MAXN];
 
@@ -18,12 +19,14 @@ main(int argc, char **argv)
 		exit(-1);
 	}
 
+
 	string strIPaddr  = argv[1];
+
 	string strPort	  = argv[2];
 	string strSrcFile = argv[3];
 	string strDstFile = argv[4];
 
-	nchildren = 1;//×Ó½ø³ÌÊýÁ¿
+	nchildren = 1;//ï¿½Ó½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	//snprintf(request, sizeof(request), "src:%s, dst:%s\n", strSrcFile.c_str(),strDstFile.c_str()); /* newline at end */
 
@@ -31,10 +34,18 @@ main(int argc, char **argv)
 	{
 		if ( (pid = fork()) == 0) 
 		{	/* child */
-			//Á¬½Óserver
+			//ï¿½ï¿½ï¿½ï¿½server
 			fd = TcpConnect(strIPaddr,atoi(strPort.c_str()));
 
-			FILE *fileSrc;//Ô´ÎÄ¼þÃèÊö·û
+			CSerialize objSeri;
+			objSeri.serialize(MS_MSG_REQ_SENDFILE);
+			objSeri.serialize(strDstFile.c_str());
+
+			char *pcStr = objSeri.getBuffer();
+
+			write(fd, pcStr, strlen(pcStr));// != strlen(pcStr)
+
+			FILE *fileSrc;//Ô´ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if ((fileSrc = fopen(strSrcFile.c_str(),"rb")) == NULL)
 			{//open file error
 				printf("open src file %s fail!\n",strSrcFile.c_str());
@@ -46,30 +57,30 @@ main(int argc, char **argv)
 			{
 				printf("read file\n");
 				if ((nReadSize = fread(request,sizeof(char),MAXLINE,fileSrc)) == 0)
-				{//Ã»ÓÐ¶Áµ½Êý¾Ý
+				{//Ã»ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 				}
 				else
-				{//·¢ËÍÒÑ¾­¶ÁÈ¡µÄÊý¾Ý
-					//½«Êý¾Ý·¢ËÍ
+				{//ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½
+					//ï¿½ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½
 					if (write(fd, request, strlen(request)) != strlen(request))
 					{
 						printf("write error[%s]\n",request);
 					}
 				}
 			}
-			//¹Ø±Õ´ò¿ªµÄÎÄ¼þ
+			//ï¿½Ø±Õ´ò¿ªµï¿½ï¿½Ä¼ï¿½
 			fclose(fileSrc);
 	
 			//if ( (n = readn(fd, reply, nbytes)) != nbytes)
 			//	printf("server returned %d bytes\n", n);
 
-			//Ö÷¶¯¹Ø±ÕÁ¬½Ó
+			//ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½ï¿½ï¿½ï¿½ï¿½
 			//close(fd);		/* TIME_WAIT on client, not server */
 			TcpClose(fd);
 			
 			printf("child %d done\n", i);
-			//ÍË³ö×Ó½ø³Ì
+			//ï¿½Ë³ï¿½ï¿½Ó½ï¿½ï¿½
 			exit(0);
 		}
 	}
