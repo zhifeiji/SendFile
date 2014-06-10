@@ -20,6 +20,7 @@ private:
 public:
 	CSerialize()
 	{
+		memset(m_pStr,'\0',MAX_SERIALIZE_BUF);
 		//m_pStr = ptr;
 		//m_nPos = 0;
 	}

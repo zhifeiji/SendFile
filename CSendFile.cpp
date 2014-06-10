@@ -6,7 +6,6 @@
 int
 main(int argc, char **argv)
 {
-	printf("hello\n");
 	using namespace MySocket;
 
 	int	 fd;//
@@ -22,7 +21,6 @@ main(int argc, char **argv)
 
 
 	string strIPaddr  = argv[1];
-
 	string strPort	  = argv[2];
 	string strSrcFile = argv[3];
 	string strDstFile = argv[4];
@@ -79,7 +77,9 @@ main(int argc, char **argv)
 			TcpSend(fd,pcStr,strlen(pcStr));
 			//printf("send data[%s]\n",pcStr);
 
-
+			sleep(2);
+			TcpSend(fd,pcStr,strlen(pcStr));
+			sleep(2);
 			char m_pszMsg[MAX_LINE_BUF];
 			int nRecv = TcpRecv(fd,m_pszMsg,MAX_LINE_BUF);
 			CUNSerialize objUNSeri(m_pszMsg);

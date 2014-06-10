@@ -14,6 +14,7 @@ CServerTask::~CServerTask()
 int CServerTask::RecvMsg()
 {
 	//char recBuf[MAX_LINE_BUF];
+	memset(m_pszMsg,'\0',MAX_LINE_BUF);
 
 	int nRecv = TcpRecv(m_socketfd,m_pszMsg,MAX_LINE_BUF);
 	if (nRecv > 0)

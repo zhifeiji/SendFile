@@ -51,8 +51,8 @@ using namespace std;
 
 
 //socket msg
-#define HEAD_SIZE		4
-#define MODE_NUM		127
+#define HEAD_SIZE		20
+#define MODE_NUM		10
 
 #define MS_MSG_RES_RECV_OK		1
 
@@ -85,31 +85,31 @@ using namespace std;
 
 
 
-// 
-// static
-// ssize_t						/* Read "n" bytes from a descriptor. */
-// readn(int fd, void *vptr, size_t n)
-// {
-// 	size_t	nleft;
-// 	ssize_t	nread;
-// 	char	*ptr;
-// 
-// 	ptr = (char *)vptr;
-// 	nleft = n;
-// 	while (nleft > 0) {
-// 		if ( (nread = read(fd, ptr, nleft)) < 0) {
-// 			if (errno == EINTR)
-// 				nread = 0;		/* and call read() again */
-// 			else
-// 				return(-1);
-// 		} else if (nread == 0)
-// 			break;				/* EOF */
-// 
-// 		nleft -= nread;
-// 		ptr   += nread;
-// 	}
-// 	return(n - nleft);		/* return >= 0 */
-// }
+
+ static
+ ssize_t						/* Read "n" bytes from a descriptor. */
+ readn(int fd, void *vptr, size_t n)
+ {
+ 	size_t	nleft;
+ 	ssize_t	nread;
+ 	char	*ptr;
+
+ 	ptr = (char *)vptr;
+ 	nleft = n;
+ 	while (nleft > 0) {
+ 		if ( (nread = read(fd, ptr, nleft)) < 0) {
+ 			if (errno == EINTR)
+ 				nread = 0;		/* and call read() again */
+ 			else
+ 				return(-1);
+ 		} else if (nread == 0)
+ 			break;				/* EOF */
+
+ 		nleft -= nread;
+ 		ptr   += nread;
+ 	}
+ 	return(n - nleft);		/* return >= 0 */
+ }
 // /* end readn */
 // 
 // 

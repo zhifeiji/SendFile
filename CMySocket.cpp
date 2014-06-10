@@ -67,16 +67,16 @@ int MySocket::TcpAccept(int listenfd)
 int MySocket::TcpSend(int sockfd, char *ptr, int size)
 {
 	char szDst[MAX_SEND_BUF];
+	memset(szDst,'\0',MAX_SEND_BUF);
 	int nLengh = setHeadLengh(szDst,ptr,size);
 	
-
 	if (write(sockfd, szDst, nLengh) != nLengh)
 	{
 		//write error
 		printf("write error[%s]\n",ptr);
 		//exit(-1);
 	}
-	printf("send datta [%s]\n",szDst);
+	printf("send datta success [%s]\n",szDst);
 
 	return ERROR_NO_ERROR;
 }
@@ -87,13 +87,14 @@ int MySocket::tcpRecv(int sockfd, char *ptr, int size)
 	//char buf[MAXLINE];
 	//memset(ptr,'\0',size);
 	char *pCur = ptr;
-
+	printf("%d byte need to read\n",size);
 	while (size > 0)
 	{
 		printf("-\n");
 		if ((n = read(sockfd,pCur,size)) > 0)
 		{
 			printf("recv:[%d] byte\n",n);
+			printf("recv:[%s]\n",pCur);
 			size = size -n;
 			pCur = pCur + n;
 			nCount += n;
@@ -114,11 +115,11 @@ int MySocket::TcpRecv(int sockfd, char *ptr, int size)
 	int nLengh  = 0;
 	for (int i = HEAD_SIZE-1;i>=0;--i)
 	{
-		nLengh = nLengh * MODE_NUM + int(szHead[i] - 1);
+		nLengh = nLengh * MODE_NUM + int(szHead[i] - '0');
 	}
 	printf("head len %d\n",nLengh);
 
-	n = tcpRecv(sockfd,ptr,nLengh);
+	n = tcpRecv(sockfd,ptr,nLengh-1);
 	DEBUG_PRINT("recv [%s]\n",ptr);
 	return n;
 }
@@ -130,8 +131,8 @@ int MySocket::TcpClose(int sockfd)
 
 int MySocket::setHeadLengh(char *dst,const char *src,const int srcSize)
 {
-	printf("comput head lengh:");
-	int nLengh = srcSize+HEAD_SIZE;
+	printf("comput head lengh:\n");
+	int nLengh = srcSize;
 	int nMode;
 	for (int n=0;n<HEAD_SIZE;++n)
 	{
@@ -141,19 +142,18 @@ int MySocket::setHeadLengh(char *dst,const char *src,const int srcSize)
 			nMode = nLengh % MODE_NUM;
 			nLengh /= MODE_NUM;
 		}
-		dst[n] = (char)nMode + 1;
-		printf("--->%d\n",dst[n]);
+		dst[n] = nMode + '0';
+		//printf("--->%c\n",dst[n]);
 	}
+	dst[HEAD_SIZE] = '\n';
 	printf("\n");
 	printf("dst len [%d]\n",strlen(dst));
 	strncat(dst,src,srcSize);
 	printf("after set head [%s]\n",dst);
 	//printf("dst[0]")
-	for (int i = 0;i<HEAD_SIZE;++i)
-	{
-		printf("dst[%d] -->%d\n",i,dst[i]);
-	}
-	
-
-	return nLengh;
+//	for (int i = 0;i<HEAD_SIZE;++i)
+//	{
+//		printf("dst[%d] -->%d\n",i,dst[i]);
+//	}
+	return nLengh + HEAD_SIZE;
 }
