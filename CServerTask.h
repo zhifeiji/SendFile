@@ -5,12 +5,18 @@
 
 #include "global.h"
 #include "CMySocket.h"
+#include "CSerialize.h"
 using namespace MySocket;
+
+#define MAX_FILE_NAME_LENGH	256
 
 class CServerTask
 {
 private:
 	int m_socketfd;
+	CUNSerialize m_objUNSeri;
+	CSerialize m_objSeri;
+	char *m_pszMsg;
 
 public:
 	CServerTask(int socketfd);
@@ -18,6 +24,13 @@ public:
 
 public:
 	void Run();
+
+private:
+	int RecvMsg();
+	void SendMsg();
+	void SendOK();
+	
+	void HdReqSendFile();
 
 };
 

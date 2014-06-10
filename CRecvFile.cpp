@@ -18,7 +18,7 @@ main(int argc, char **argv)
 	{
 		listenfd = TcpListen();
 	}
-	else if (argc == 1)
+	else if (argc == 2)
 	{
 		listenfd = TcpListen(atoi(argv[1]));
 	}

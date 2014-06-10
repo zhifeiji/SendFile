@@ -66,28 +66,94 @@ int MySocket::TcpAccept(int listenfd)
 
 int MySocket::TcpSend(int sockfd, char *ptr, int size)
 {
-	if (write(sockfd, ptr, size) != size)
+	char szDst[MAX_SEND_BUF];
+	int nLengh = setHeadLengh(szDst,ptr,size);
+	
+
+	if (write(sockfd, szDst, nLengh) != nLengh)
 	{
 		//write error
 		printf("write error[%s]\n",ptr);
 		//exit(-1);
 	}
+	printf("send datta [%s]\n",szDst);
 
 	return ERROR_NO_ERROR;
 }
 
+int MySocket::tcpRecv(int sockfd, char *ptr, int size)
+{
+	ssize_t n,nCount = 0;
+	//char buf[MAXLINE];
+	//memset(ptr,'\0',size);
+	char *pCur = ptr;
+
+	while (size > 0)
+	{
+		printf("-\n");
+		if ((n = read(sockfd,pCur,size)) > 0)
+		{
+			printf("recv:[%d] byte\n",n);
+			size = size -n;
+			pCur = pCur + n;
+			nCount += n;
+			//printf("recv %d byte\n",n);
+		}
+	}
+	return nCount;
+}
 int MySocket::TcpRecv(int sockfd, char *ptr, int size)
 {
-	ssize_t n;
-	//char buf[MAXLINE];
-	if ((n = read(sockfd,ptr,size)) > 0)
+	printf("begin TcpRecv\n");
+	char szHead[HEAD_SIZE+1];
+	memset(szHead,'\0',HEAD_SIZE+1);
+	int n = tcpRecv(sockfd,szHead,int(HEAD_SIZE));
+
+	printf("sz head [%s]\n",szHead);
+
+	int nLengh  = 0;
+	for (int i = HEAD_SIZE-1;i>=0;--i)
 	{
-		printf("recv:[%d][%s]\n",n,ptr);
+		nLengh = nLengh * MODE_NUM + int(szHead[i] - 1);
 	}
+	printf("head len %d\n",nLengh);
+
+	n = tcpRecv(sockfd,ptr,nLengh);
+	DEBUG_PRINT("recv [%s]\n",ptr);
 	return n;
 }
-
 int MySocket::TcpClose(int sockfd)
 {
 	return close(sockfd);
+}
+
+
+int MySocket::setHeadLengh(char *dst,const char *src,const int srcSize)
+{
+	printf("comput head lengh:");
+	int nLengh = srcSize+HEAD_SIZE;
+	int nMode;
+	for (int n=0;n<HEAD_SIZE;++n)
+	{
+		nMode = 0;
+		if (nLengh != 0)
+		{
+			nMode = nLengh % MODE_NUM;
+			nLengh /= MODE_NUM;
+		}
+		dst[n] = (char)nMode + 1;
+		printf("--->%d\n",dst[n]);
+	}
+	printf("\n");
+	printf("dst len [%d]\n",strlen(dst));
+	strncat(dst,src,srcSize);
+	printf("after set head [%s]\n",dst);
+	//printf("dst[0]")
+	for (int i = 0;i<HEAD_SIZE;++i)
+	{
+		printf("dst[%d] -->%d\n",i,dst[i]);
+	}
+	
+
+	return nLengh;
 }
